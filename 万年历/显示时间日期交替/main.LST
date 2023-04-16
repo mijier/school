@@ -1,0 +1,119 @@
+C51 COMPILER V9.00   MAIN                                                                  04/16/2023 15:56:47 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: G:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          //1.c
+   2          #include"REG51.h"
+   3          #include"intrins.h"
+   4          #include "stdio.h"
+   5          #include "seg.h"
+   6          
+   7          void seg_pro();
+   8          
+   9          char hour=9,min=31,sec=10;
+  10          int year =2023;
+  11          char month=1,day=12; 
+  12          char display_dat[8];
+  13          char display_char[10];
+  14          unsigned char flag_mode=0;
+  15          bit  flag_dayORtime=0;  //日期和时间模式标志
+  16          
+  17          void main()
+  18          {
+  19   1              unsigned int m;
+  20   1              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);              
+  21   1              char_to_code(display_char,display_dat);
+  22   1      
+  23   1              TMOD=0x01;
+  24   1              TH0=0XFC;
+  25   1              TL0=0X18;
+  26   1              TR0=1;
+  27   1              ET0=1;
+  28   1              EA=1;
+  29   1              
+  30   1              while(1)
+  31   1              {
+  32   2                      seg_pro();
+  33   2                      //SEG_refresh(display_dat);
+  34   2                      //for(m=0;m<500;m++);      
+  35   2              }
+  36   1      }
+*** WARNING C280 IN LINE 19 OF MAIN.C: 'm': unreferenced local variable
+  37          
+  38          void timer0() interrupt 1
+  39          {       
+  40   1              
+  41   1              static unsigned int times=0;
+  42   1              TH0=0XFC;
+  43   1              TL0=0X18;
+  44   1              times++;
+  45   1              SEG_refresh(display_dat);
+  46   1              if(times==3000)
+  47   1              {
+  48   2                      flag_dayORtime= ~flag_dayORtime;
+  49   2                      times=0;
+  50   2              }
+  51   1              if(times%1000==0)        //1秒
+  52   1              {
+  53   2                      if(++sec==60)
+  54   2                      {
+C51 COMPILER V9.00   MAIN                                                                  04/16/2023 15:56:47 PAGE 2   
+
+  55   3                              sec=0;
+  56   3                              if(++min==0)
+  57   3                              {
+  58   4                                      min=0;
+  59   4                                      if(++hour==24) hour=0;
+  60   4                              }
+  61   3                      }
+  62   2              }
+  63   1      
+  64   1      
+  65   1      }
+  66          
+  67          void seg_pro()           
+  68          {       
+  69   1              if(flag_mode==0) //日期和时间交替显示模式
+  70   1              {
+  71   2                      if(!flag_dayORtime)//时间显示模式
+  72   2                      {               
+  73   3                              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);
+  74   3                              char_to_code(display_char,display_dat);
+  75   3                      }
+  76   2                      else//日期显示模式
+  77   2                      {
+  78   3                              sprintf(display_char,"%4d%02d%02d",(int)year,(int)month,(int)day);
+  79   3                              char_to_code(display_char,display_dat);
+  80   3                      }
+  81   2              }
+  82   1              else if(flag_mode==1)//调整小时模式
+  83   1              {
+  84   2                      sprintf(display_char,"S1    %02d",(int)hour);
+  85   2                      char_to_code(display_char,display_dat);
+  86   2              }
+  87   1              else if(flag_mode==2)//调整分钟模式
+  88   1              {
+  89   2                      sprintf(display_char,"S2    %02d",(int)min);
+  90   2                      char_to_code(display_char,display_dat);
+  91   2              }
+  92   1      }
+  93          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    382    ----
+   CONSTANT SIZE    =     49    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     28       2
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

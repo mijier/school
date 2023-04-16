@@ -1,0 +1,57 @@
+<html>
+<body>
+<pre>
+<h1>礦ision Build Log</h1>
+<h2>Project:</h2>
+C:\Users\林杨\Desktop\万年历\01\1.uvproj
+Project File Date:  04/16/2023
+
+<h2>Output:</h2>
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+MAIN.C(7): error C251: illegal octal digit
+Target not created
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+MAIN.C(7): error C251: illegal octal digit
+compiling seg.c...
+Target not created
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+MAIN.C(7): error C251: illegal octal digit
+compiling seg.c...
+Target not created
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+compiling seg.c...
+linking...
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?PRINTF?PRINTF
+    CALLER1: ?C_C51STARTUP
+    CALLER2: ?PR?TIMER0?MAIN
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?_CHAR_TO_CODE?SEG
+    CALLER1: ?C_C51STARTUP
+    CALLER2: ?PR?TIMER0?MAIN
+Program Size: data=76.2 xdata=0 code=1787
+"1" - 0 Error(s), 2 Warning(s).
+Build target 'Target 1'
+assembling STARTUP.A51...
+compiling main.c...
+compiling seg.c...
+linking...
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?PRINTF?PRINTF
+    CALLER1: ?C_C51STARTUP
+    CALLER2: ?PR?TIMER0?MAIN
+*** WARNING L15: MULTIPLE CALL TO SEGMENT
+    SEGMENT: ?PR?_CHAR_TO_CODE?SEG
+    CALLER1: ?C_C51STARTUP
+    CALLER2: ?PR?TIMER0?MAIN
+Program Size: data=76.2 xdata=0 code=1787
+creating hex file from "1"...
+"1" - 0 Error(s), 2 Warning(s).

@@ -1,0 +1,78 @@
+C51 COMPILER V9.00   MAIN                                                                  04/16/2023 14:13:56 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: G:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          //1.c
+   2          #include"REG51.h"
+   3          #include"intrins.h"
+   4          #include "stdio.h"
+   5          #include "seg.h"
+   6          
+   7          char hour=9,min=31,sec=10;
+   8          char display_dat[8];
+   9          char display_char[10];
+  10          
+  11          void main()
+  12          {
+  13   1              unsigned int m;
+  14   1              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);              
+  15   1              char_to_code(display_char,display_dat);
+  16   1      
+  17   1              TMOD=0x01;
+  18   1              TH0=0x3c;
+  19   1              TL0=0xB0;
+  20   1              TR0=1;
+  21   1              ET0=1;
+  22   1              EA=1;
+  23   1              
+  24   1              while(1)
+  25   1              {
+  26   2                      SEG_refresh(display_dat);
+  27   2                      for(m=0;m<500;m++);        
+  28   2              }
+  29   1      }
+  30          
+  31          void timer0() interrupt 1
+  32          {
+  33   1              static char times=0;
+  34   1              TH0=0x3c;
+  35   1              TL0=0xB0;
+  36   1              times++;
+  37   1              if(times==20)
+  38   1              {
+  39   2                      times=0;
+  40   2                      if(++sec==60)
+  41   2                      {
+  42   3                              sec=0;
+  43   3                              if(++min==0)
+  44   3                              {
+  45   4                                      min=0;
+  46   4                                      if(++hour==24) hour=0;
+  47   4                              }
+  48   3                      }       
+  49   2              }
+  50   1              
+  51   1              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);              
+  52   1              char_to_code(display_char,display_dat);
+  53   1      }
+
+
+C51 COMPILER V9.00   MAIN                                                                  04/16/2023 14:13:56 PAGE 2   
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    272    ----
+   CONSTANT SIZE    =     15    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     22    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
