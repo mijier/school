@@ -1,4 +1,5 @@
 "STARTUP.obj",
 "main.obj",
-"seg.obj" 
+"seg.obj",
+"key.obj" 
 TO "1" 

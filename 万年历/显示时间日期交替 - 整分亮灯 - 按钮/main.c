@@ -4,8 +4,11 @@
 #include "stdio.h"
 #include "seg.h"
 
+unsigned char key_can();
 void seg_pro();
 void led();
+void key_pro();
+
 
 char hour=9,min=31,sec=55;
 int year =2023;
@@ -18,6 +21,8 @@ bit  flag_dayORtime=0;  //日期和时间模式标志
 bit  flag_minute=0;     //整分到标志
 bit  flag_200ms=0;      //0.2s到标志
 unsigned char LED_count=0,LED_data=0xfe;
+
+unsigned char key_new,key_old=0;
 
 void main()
 {
@@ -36,6 +41,7 @@ void main()
 	{
 		seg_pro();
 		led();
+		key_pro();
 		//SEG_refresh(display_dat);
 		//for(m=0;m<500;m++);	   
 	}
@@ -120,3 +126,38 @@ void led()
 		}
 	}
 }
+
+
+//按键处理函数
+void key_pro()
+{ 
+	key_new=key_can();  //获取按键定义值
+	switch((key_new ^ key_old) & key_new)//下降沿判断按键
+	{
+		case 1://按下S1
+			if(++flag_mode==3) flag_mode=0;    
+				break;
+		case 2: //按下S2
+			if(flag_mode==1)  //如果是小时调整界面，就将小时增加 
+			{
+				if(++hour==24) hour=0;
+			}
+			else if(flag_mode==2)  //如果是分钟调整界面，就将分钟增加
+			{
+				if(++min==60) min=0;
+			}  
+			break;
+		case 3:  //按下S3
+			if(flag_mode==1) //如果是小时调整界面，就将小时减小
+			{
+				if(--hour==-1) hour=23;
+			}
+			else if(flag_mode==2)//如果是分钟调整界面，就将分钟减小
+			{
+				if(--min==-1) min=59;
+			}
+			break;
+	}
+	key_old=key_new;	 
+}
+

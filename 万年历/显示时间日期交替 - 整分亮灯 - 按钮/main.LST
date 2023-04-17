@@ -1,4 +1,4 @@
-C51 COMPILER V9.00   MAIN                                                                  04/16/2023 16:56:58 PAGE 1   
+C51 COMPILER V9.00   MAIN                                                                  04/17/2023 23:47:13 PAGE 1   
 
 
 C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
@@ -13,135 +13,176 @@ line level    source
    4          #include "stdio.h"
    5          #include "seg.h"
    6          
-   7          void seg_pro();
-   8          void led();
-   9          
-  10          char hour=9,min=31,sec=55;
-  11          int year =2023;
-  12          char month=1,day=12; 
-  13          char display_dat[8];
-  14          char display_char[10];
-  15          unsigned char flag_mode=0;//界面显示模式：0为日期和时间交替显示界面，1为调整小时界面，2为调整分钟界面
-  16          bit  flag_dayORtime=0;  //日期和时间模式标志
-  17          
-  18          bit  flag_minute=0;     //整分到标志
-  19          bit  flag_200ms=0;      //0.2s到标志
-  20          unsigned char LED_count=0,LED_data=0xfe;
-  21          
-  22          void main()
-  23          {
-  24   1              unsigned int m;
-  25   1              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);              
-  26   1              char_to_code(display_char,display_dat);
-  27   1      
-  28   1              TMOD=0x01;
-  29   1              TH0=0XFC;
-  30   1              TL0=0X18;
-  31   1              TR0=1;
-  32   1              ET0=1;
-  33   1              EA=1;
-  34   1              
-  35   1              while(1)
-  36   1              {
-  37   2                      seg_pro();
-  38   2                      led();
-  39   2                      //SEG_refresh(display_dat);
-  40   2                      //for(m=0;m<500;m++);      
-  41   2              }
-  42   1      }
-*** WARNING C280 IN LINE 24 OF MAIN.C: 'm': unreferenced local variable
-  43          
-  44          void timer0() interrupt 1
-  45          {       
-  46   1              
-  47   1              static unsigned int times=0;
-  48   1              TH0=0XFC;
-  49   1              TL0=0X18;
-  50   1              times++;
-  51   1              SEG_refresh(display_dat);
-  52   1              if(times==3000)
-  53   1              {
-  54   2                      flag_dayORtime= ~flag_dayORtime;
-C51 COMPILER V9.00   MAIN                                                                  04/16/2023 16:56:58 PAGE 2   
+   7          unsigned char key_can();
+   8          void seg_pro();
+   9          void led();
+  10          void key_pro();
+  11          
+  12          
+  13          char hour=9,min=31,sec=55;
+  14          int year =2023;
+  15          char month=1,day=12; 
+  16          char display_dat[8];
+  17          char display_char[10];
+  18          unsigned char flag_mode=0;//界面显示模式：0为日期和时间交替显示界面，1为调整小时界面，2为调整分钟界面
+  19          bit  flag_dayORtime=0;  //日期和时间模式标志
+  20          
+  21          bit  flag_minute=0;     //整分到标志
+  22          bit  flag_200ms=0;      //0.2s到标志
+  23          unsigned char LED_count=0,LED_data=0xfe;
+  24          
+  25          unsigned char key_new,key_old=0;
+  26          
+  27          void main()
+  28          {
+  29   1              unsigned int m;
+  30   1              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);              
+  31   1              char_to_code(display_char,display_dat);
+  32   1      
+  33   1              TMOD=0x01;
+  34   1              TH0=0XFC;
+  35   1              TL0=0X18;
+  36   1              TR0=1;
+  37   1              ET0=1;
+  38   1              EA=1;
+  39   1              
+  40   1              while(1)
+  41   1              {
+  42   2                      seg_pro();
+  43   2                      led();
+  44   2                      key_pro();
+  45   2                      //SEG_refresh(display_dat);
+  46   2                      //for(m=0;m<500;m++);      
+  47   2              }
+  48   1      }
+*** WARNING C280 IN LINE 29 OF MAIN.C: 'm': unreferenced local variable
+  49          
+  50          void timer0() interrupt 1
+  51          {       
+  52   1              
+  53   1              static unsigned int times=0;
+  54   1              TH0=0XFC;
+C51 COMPILER V9.00   MAIN                                                                  04/17/2023 23:47:13 PAGE 2   
 
-  55   2                      times=0;
-  56   2              }
-  57   1              if(times%1000==0)        //1秒
-  58   1              {
-  59   2                      if(++sec==60)
-  60   2                      {
-  61   3                              flag_minute=1;
-  62   3                              sec=0;
-  63   3                              if(++min==0)
-  64   3                              {
-  65   4                                      min=0;
-  66   4                                      if(++hour==24) hour=0;
-  67   4                              }
-  68   3                      }
-  69   2              }
-  70   1      
-  71   1              if(times%200==0)           //0.2秒到——流水灯操作
-  72   1                      flag_200ms=1;      //置0.2秒到标志位，在led_pro函数中处理
-  73   1      
-  74   1      }
-  75          
-  76          //数码管界面显示
-  77          void seg_pro()           
-  78          {       
-  79   1              if(flag_mode==0) //日期和时间交替显示模式
-  80   1              {
-  81   2                      if(!flag_dayORtime)//时间显示模式
-  82   2                      {               
-  83   3                              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);
-  84   3                              char_to_code(display_char,display_dat);
-  85   3                      }
-  86   2                      else//日期显示模式
-  87   2                      {
-  88   3                              sprintf(display_char,"%4d%02d%02d",(int)year,(int)month,(int)day);
-  89   3                              char_to_code(display_char,display_dat);
-  90   3                      }
-  91   2              }
-  92   1              else if(flag_mode==1)//调整小时模式
-  93   1              {
-  94   2                      sprintf(display_char,"S1    %02d",(int)hour);
-  95   2                      char_to_code(display_char,display_dat);
-  96   2              }
-  97   1              else if(flag_mode==2)//调整分钟模式
-  98   1              {
-  99   2                      sprintf(display_char,"S2    %02d",(int)min);
- 100   2                      char_to_code(display_char,display_dat);
- 101   2              }
- 102   1      }
- 103          
- 104          //LED小灯
- 105          void led()
- 106          {
- 107   1              if(flag_200ms)   //0.2秒到
- 108   1              {
- 109   2                      flag_200ms=0;   //清0.2秒标志
- 110   2                      if(flag_minute) //判断是否要流水
- 111   2                      {
- 112   3                              P1=LED_data;
- 113   3                              LED_data=_crol_(LED_data,1);
- 114   3                              if(++LED_count==17)     //次数达到16，也就是两轮流水
- 115   3                              {
- 116   4                                      flag_minute=0;   //关闭整分标志
-C51 COMPILER V9.00   MAIN                                                                  04/16/2023 16:56:58 PAGE 3   
+  55   1              TL0=0X18;
+  56   1              times++;
+  57   1              SEG_refresh(display_dat);
+  58   1              if(times==3000)
+  59   1              {
+  60   2                      flag_dayORtime= ~flag_dayORtime;
+  61   2                      times=0;
+  62   2              }
+  63   1              if(times%1000==0)        //1秒
+  64   1              {
+  65   2                      if(++sec==60)
+  66   2                      {
+  67   3                              flag_minute=1;
+  68   3                              sec=0;
+  69   3                              if(++min==0)
+  70   3                              {
+  71   4                                      min=0;
+  72   4                                      if(++hour==24) hour=0;
+  73   4                              }
+  74   3                      }
+  75   2              }
+  76   1      
+  77   1              if(times%200==0)           //0.2秒到——流水灯操作
+  78   1                      flag_200ms=1;      //置0.2秒到标志位，在led_pro函数中处理
+  79   1      
+  80   1      }
+  81          
+  82          //数码管界面显示
+  83          void seg_pro()           
+  84          {       
+  85   1              if(flag_mode==0) //日期和时间交替显示模式
+  86   1              {
+  87   2                      if(!flag_dayORtime)//时间显示模式
+  88   2                      {               
+  89   3                              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);
+  90   3                              char_to_code(display_char,display_dat);
+  91   3                      }
+  92   2                      else//日期显示模式
+  93   2                      {
+  94   3                              sprintf(display_char,"%4d%02d%02d",(int)year,(int)month,(int)day);
+  95   3                              char_to_code(display_char,display_dat);
+  96   3                      }
+  97   2              }
+  98   1              else if(flag_mode==1)//调整小时模式
+  99   1              {
+ 100   2                      sprintf(display_char,"S1    %02d",(int)hour);
+ 101   2                      char_to_code(display_char,display_dat);
+ 102   2              }
+ 103   1              else if(flag_mode==2)//调整分钟模式
+ 104   1              {
+ 105   2                      sprintf(display_char,"S2    %02d",(int)min);
+ 106   2                      char_to_code(display_char,display_dat);
+ 107   2              }
+ 108   1      }
+ 109          
+ 110          //LED小灯
+ 111          void led()
+ 112          {
+ 113   1              if(flag_200ms)   //0.2秒到
+ 114   1              {
+ 115   2                      flag_200ms=0;   //清0.2秒标志
+ 116   2                      if(flag_minute) //判断是否要流水
+C51 COMPILER V9.00   MAIN                                                                  04/17/2023 23:47:13 PAGE 3   
 
- 117   4                                      LED_count=0;     //清除流水次数
- 118   4                                      P1=0xff;                //关闭LED灯
- 119   4                              }
- 120   3                      }
- 121   2              }
- 122   1      }
+ 117   2                      {
+ 118   3                              P1=LED_data;
+ 119   3                              LED_data=_crol_(LED_data,1);
+ 120   3                              if(++LED_count==17)     //次数达到16，也就是两轮流水
+ 121   3                              {
+ 122   4                                      flag_minute=0;   //关闭整分标志
+ 123   4                                      LED_count=0;     //清除流水次数
+ 124   4                                      P1=0xff;                //关闭LED灯
+ 125   4                              }
+ 126   3                      }
+ 127   2              }
+ 128   1      }
+ 129          
+ 130          
+ 131          //按键处理函数
+ 132          void key_pro()
+ 133          { 
+ 134   1              key_new=key_can();  //获取按键定义值
+ 135   1              switch((key_new ^ key_old) & key_new)//下降沿判断按键
+ 136   1              {
+ 137   2                      case 1://按下S1
+ 138   2                              if(++flag_mode==3) flag_mode=0;    
+ 139   2                                      break;
+ 140   2                      case 2: //按下S2
+ 141   2                              if(flag_mode==1)  //如果是小时调整界面，就将小时增加 
+ 142   2                              {
+ 143   3                                      if(++hour==24) hour=0;
+ 144   3                              }
+ 145   2                              else if(flag_mode==2)  //如果是分钟调整界面，就将分钟增加
+ 146   2                              {
+ 147   3                                      if(++min==60) min=0;
+ 148   3                              }  
+ 149   2                              break;
+ 150   2                      case 3:  //按下S3
+ 151   2                              if(flag_mode==1) //如果是小时调整界面，就将小时减小
+ 152   2                              {
+ 153   3                                      if(--hour==-1) hour=23;
+ 154   3                              }
+ 155   2                              else if(flag_mode==2)//如果是分钟调整界面，就将分钟减小
+ 156   2                              {
+ 157   3                                      if(--min==-1) min=59;
+ 158   3                              }
+ 159   2                              break;
+ 160   2              }
+ 161   1              key_old=key_new;         
+ 162   1      }
+ 163          
 
 
 MODULE INFORMATION:   STATIC OVERLAYABLE
-   CODE SIZE        =    444    ----
+   CODE SIZE        =    552    ----
    CONSTANT SIZE    =     49    ----
    XDATA SIZE       =   ----    ----
    PDATA SIZE       =   ----    ----
-   DATA SIZE        =     30       2
+   DATA SIZE        =     32       2
    IDATA SIZE       =   ----    ----
    BIT SIZE         =      3    ----
 END OF MODULE INFORMATION.
