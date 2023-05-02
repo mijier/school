@@ -5,11 +5,10 @@
 
 #include "seg.h"
 
-//unsigned char key_can();
+unsigned char key_can();
 void seg_pro();
 void led();
 void key_pro();
-
 
 char hour=9,min=31,sec=55;
 int year =2023;
@@ -27,7 +26,6 @@ unsigned char key_new,key_old=0;
 
 void main()
 {
-	unsigned int m;
 	sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);		 
 	char_to_code(display_char,display_dat);
 
@@ -42,9 +40,7 @@ void main()
 	{
 		seg_pro();
 		led();
-		key_pro();
-		//SEG_refresh(display_dat);
-		//for(m=0;m<500;m++);	   
+		key_pro();   
 	}
 }
 
@@ -161,4 +157,3 @@ void key_pro()
 	}
 	key_old=key_new;	 
 }
-
