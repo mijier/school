@@ -68,10 +68,8 @@ void timer0() interrupt 1
 			}
 		}
 	}
-
 	if(times%200==0)	   //0.2秒到——流水灯操作
 		flag_200ms=1;	   //置0.2秒到标志位，在led_pro函数中处理
-
 }
 
 //数码管界面显示

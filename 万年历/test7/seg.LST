@@ -1,0 +1,60 @@
+C51 COMPILER V9.00   SEG                                                                   05/03/2023 22:06:00 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE SEG
+OBJECT MODULE PLACED IN seg.OBJ
+COMPILER INVOKED BY: G:\Keil\C51\BIN\C51.EXE seg.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "reg51.h"
+   2          #include "intrins.h"
+   3          #include "stdio.h"
+   4          
+   5          unsigned char code display_code[]={'S',0X92,' ',0xff,'0',0xC0,'1',0xF9,'2',0xA4,'3',0xB0,'4',0x99,'5',0x92
+             -,'6',0x82,'7',0xF8,'8',0x80,'9',0x90,'-',0xbf};
+   6          
+   7          void SEG_refresh(unsigned char *p)
+   8          {
+   9   1              static char i=0,x=0xfe;
+  10   1      
+  11   1              P2=0xff;
+  12   1              P0=x;
+  13   1              P2=p[i];
+  14   1      
+  15   1              x=_crol_(x,1);
+  16   1              i++;
+  17   1      
+  18   1              if(i==8)i=0;
+  19   1      }
+  20          
+  21          void char_to_code(unsigned char *p,unsigned char *q)
+  22          {
+  23   1              static char i,j,k;
+  24   1              for(j=0,k=0;k<8;k++,j++)
+  25   1              {
+  26   2                      for(i=0;i<15;i++)
+  27   2                      {
+  28   3                              if(p[j]==display_code[2*i])
+  29   3                              {
+  30   4                                       q[k]=display_code[2*i+1];
+  31   4                                       break;
+  32   4                              }
+  33   3                      }
+  34   2              }
+  35   1      
+  36   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    166    ----
+   CONSTANT SIZE    =     26    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      5       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

@@ -1,0 +1,185 @@
+C51 COMPILER V9.00   MAIN                                                                  05/03/2023 22:06:00 PAGE 1   
+
+
+C51 COMPILER V9.00, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.OBJ
+COMPILER INVOKED BY: G:\Keil\C51\BIN\C51.EXE main.c BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "reg51.h"
+   2          #include "intrins.h"
+   3          #include "stdio.h"
+   4          
+   5          unsigned char key_can();
+   6          void SEG_refresh(unsigned char *p);
+   7          void char_to_code(unsigned char *p,unsigned char *q);
+   8          
+   9          void seg_pro();
+  10          void led();
+  11          void key_pro();
+  12          
+  13          unsigned char  display_char[10];
+  14          unsigned char  display_dat[8];
+  15          unsigned char hour=9,min=31,sec=55;
+  16          bit flag_dayORtime=0;
+  17          bit flag_200ms=0;
+  18          bit flag_minute=0;
+  19          char flag_mode=0;
+  20          unsigned int year=2023,month=5,day=5;
+  21          char key_new,key_old=0;
+  22          unsigned char LED_data=0xfe,LED_count=0;
+  23          void main()
+  24          {
+  25   1              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);
+  26   1              char_to_code(display_char,display_dat);
+  27   1      
+  28   1              TMOD=0x01;
+  29   1              TH0=0xFC;
+  30   1              TL0=0x18;
+  31   1              TR0=1;
+  32   1              ET0=1;
+  33   1              EA=1;
+  34   1      
+  35   1              while(1)
+  36   1              {
+  37   2                      seg_pro();
+  38   2                      led();
+  39   2                      key_pro();              
+  40   2              }
+  41   1      }
+  42          
+  43          void timer0() interrupt 1
+  44          {
+  45   1              static unsigned int times=0;
+  46   1              times++;
+  47   1              SEG_refresh(display_dat);
+  48   1              TH0=0xFC;
+  49   1              TL0=0x18;
+  50   1              if(times==3000)
+  51   1              {
+  52   2                      times=0;
+  53   2                      flag_dayORtime=~flag_dayORtime;
+  54   2              }
+  55   1              if(times%1000==0)
+C51 COMPILER V9.00   MAIN                                                                  05/03/2023 22:06:00 PAGE 2   
+
+  56   1              {
+  57   2                      if(++sec==60)
+  58   2                      {
+  59   3                              sec=0;
+  60   3                              flag_minute=1;
+  61   3                              if(++min==60)
+  62   3                              {
+  63   4                                      min=0;
+  64   4                                      if(++hour==24)hour=0;
+  65   4                              }
+  66   3                      }
+  67   2              }
+  68   1              if(times%200==0)
+  69   1              {
+  70   2                      flag_200ms=1;
+  71   2              }
+  72   1      }
+  73          
+  74          void seg_pro()
+  75          {
+  76   1              if(flag_mode==0)
+  77   1              {
+  78   2                      if(!flag_dayORtime)
+  79   2                      {
+  80   3                              sprintf(display_char,"%02d-%02d-%02d",(int)hour,(int)min,(int)sec);
+  81   3                              char_to_code(display_char,display_dat);
+  82   3                      }else
+  83   2                      {
+  84   3                              sprintf(display_char,"%04d%02d%02d",(int)year,(int)month,(int)day);
+  85   3                              char_to_code(display_char,display_dat);         
+  86   3                      }
+  87   2              }
+  88   1              if(flag_mode==1)
+  89   1              {
+  90   2                      sprintf(display_char,"S1    %02d",(int)hour);
+  91   2                      char_to_code(display_char,display_dat);
+  92   2              }
+  93   1              if(flag_mode==2)
+  94   1              {
+  95   2                      sprintf(display_char,"S2    %02d",(int)min);
+  96   2                      char_to_code(display_char,display_dat);
+  97   2              }
+  98   1      }
+  99          void led()
+ 100          {
+ 101   1              if(flag_200ms)
+ 102   1              {
+ 103   2                      flag_200ms=0;
+ 104   2                      if(flag_minute)
+ 105   2                      {
+ 106   3                              P1=LED_data;
+ 107   3                              LED_data=_crol_(LED_data,1);
+ 108   3                              if(++LED_count==17)
+ 109   3                              {
+ 110   4                                       flag_minute=0;
+ 111   4                                       LED_count=0;
+ 112   4                                       P1=0xff;
+ 113   4                              }
+ 114   3                      }
+ 115   2              }
+ 116   1      }
+ 117          
+C51 COMPILER V9.00   MAIN                                                                  05/03/2023 22:06:00 PAGE 3   
+
+ 118          void key_pro()
+ 119          {
+ 120   1              key_new=key_can();
+ 121   1              switch((key_new^key_old)&key_new)
+ 122   1              {
+ 123   2                      case 1:
+ 124   2                                      if(++flag_mode==3)flag_mode=0;break;
+ 125   2                      case 2:
+ 126   2                                      if(flag_mode==1)
+ 127   2                                      {
+ 128   3                                              if(++hour==24)hour=0;
+ 129   3                                      }
+ 130   2                                      if(flag_mode==2)
+ 131   2                                      {
+ 132   3                                              if(++min==60)min=0;
+ 133   3                                      }
+ 134   2                                      break;
+ 135   2                      case 3:
+ 136   2                                      if(flag_mode==1)
+ 137   2                                      {
+ 138   3                                              if(--hour==-1)hour=23;
+ 139   3                                      }
+ 140   2                                      if(flag_mode==2)
+ 141   2                                      {
+ 142   3                                              if(--min==-1)min=59;
+ 143   3                                      }
+ 144   2                                      break;
+ 145   2              }
+ 146   1              key_old=key_new;
+ 147   1      }
+ 148          
+ 149          
+ 150          
+ 151          
+ 152          
+ 153          
+ 154          
+ 155          
+ 156          
+ 157          
+ 158          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    565    ----
+   CONSTANT SIZE    =     50    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     34    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      3    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
