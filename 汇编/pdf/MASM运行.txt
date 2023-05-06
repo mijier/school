@@ -1,0 +1,3 @@
+bin\ml /c /coff a.asm
+bin\link32 /subsystem:console a.obj
+a.exe

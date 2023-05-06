@@ -1,0 +1,26 @@
+include io32.inc
+.data
+    num dword 12345678h,90abcdefh
+
+.code
+start:
+    push num+4
+    
+    mov eax,num
+    push eax
+    
+    
+    pop eax
+    call disphd
+    mov ebp,esp
+    mov eax,dword ptr [ebp+8]
+    pop eax
+    call disphd
+    
+    
+    
+exit 0
+end start
+;½á¹û£º
+;D:\MASM>a.exe
+;1234567890ABCDEF

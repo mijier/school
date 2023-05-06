@@ -1,0 +1,126 @@
+include io32.inc
+.data
+in_msg1 byte 'Enter a number:',0
+in_msg2 byte 'Enter another number:',0
+out_msg1 byte 'Two numbers are equal:',0
+out_msg2 byte 'The less number is:',0
+out_msg3 byte 13,10,'The greater number is:',0
+
+.code
+start:
+mov eax,offset in_msg1
+call dispmsg
+call readsid
+mov ebx,eax
+mov eax,offset in_msg2
+call dispmsg
+call readsid
+mov ecx,eax
+cmp ebx,ecx
+jne nequal
+mov eax,offset out_msg1
+call dispmsg
+mov eax,ebx
+call dispsid
+jmp done
+
+nequal:jl first
+        xchg ebx,ecx
+first:mov eax,oaffset out_msg2
+      call dispmsg
+      mov eax,ebx
+      call dispsid
+      mov eax,offset out_msg3
+      call dispmsg
+      mov eax,ecx
+      call dispsid
+done:
+
+exit 0
+end startinclude io32.inc
+.data
+in_msg1 byte 'Enter a number:',0
+in_msg2 byte 'Enter another number:',0
+out_msg1 byte 'Two numbers are equal:',0
+out_msg2 byte 'The less number is:',0
+out_msg3 byte 13,10,'The greater number is:',0
+
+
+.code
+start:
+mov eax,offset in_msg1
+call dispmsg
+call readsid
+mov ebx,eax
+mov eax,offset in_msg2
+call dispmsg
+call readsid
+mov ecx,eax
+cmp ebx,ecx
+jne nequal
+mov eax,offset out_msg1
+call dispmsg
+mov eax,ebx
+call dispsid
+jmp done
+
+nequal:jl first
+        xchg ebx,ecx
+first:mov eax,oaffset out_msg2
+      call dispmsg
+      mov eax,ebx
+      call dispsid
+      mov eax,offset out_msg3
+      call dispmsg
+      mov eax,ecx
+      call dispsid
+done:
+
+exit 0
+end start
+
+
+
+
+
+
+include io32.inc
+.data
+in_msg1 byte 'Enter a number:',0
+in_msg2 byte 'Enter another number:',0
+out_msg1 byte 'Two numbers are equal:',0
+out_msg2 byte 'The less number is:',0
+out_msg3 byte 13,10,'The greater number is:',0
+
+.code
+start:
+mov eax,offset in_msg1  ;提示输入Enter a number:
+call dispmsg            ;显示字符串
+call readsid            ;输入第一个数字
+mov ebx,eax             ;把输入的数字保存到ebx中
+mov eax,offset in_msg2  ;提示输入Enter another number:
+call dispmsg            ;显示字符串
+call readsid            ;在屏幕中输入一个数
+mov ecx,eax             ;把输入的数保存到ecx中
+cmp ebx,ecx             ;两个数进行比较
+jne nequal              ;jne?   两数不相等，转移
+mov eax,offset out_msg1 ;输出Two numbers are equal:
+call dispmsg            ;显示字符串
+mov eax,ebx             ;把相等的数ebx或者ecx放到eax中
+call dispsid            ;显示十进制整数
+jmp done    ;跳
+
+nequal:jl first         ;JL小于 
+       xchg ebx,ecx     ;如果大于的话，？？？
+first:mov eax,oaffset out_msg2    ;The less number is:
+      call dispmsg                ;The less number is:
+      mov eax,ebx           ;显示ebx
+      call dispsid          ;显示ebx
+      mov eax,offset out_msg3     ;The greater number is:
+      call dispmsg                ;The greater number is:
+      mov eax,ecx           ;显示ecx
+      call dispsid          ;显示ecx
+done:
+
+exit 0
+end start

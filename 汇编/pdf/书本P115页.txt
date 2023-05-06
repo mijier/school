@@ -1,0 +1,46 @@
+include io32.inc
+.data
+    key byte 234
+    bufnum =255
+    buffer byte bufnum+1 dup(0)
+    msg1 byte 'Enter message:',0
+    msg2 byte 'Enrypted message:',0
+    msg3 byte 13,10,'Original message:',0
+
+.code
+start:
+    mov eax,offset msg1
+    call dispmsg
+    mov eax,offset buffer
+    call readmsg
+    push eax
+    mov ecx,eax
+    xor ebx,ebx
+    mov al,key
+    encrypt:xor buffer[ebx],al
+            inc ebx
+            dec ecx
+            jnz encrypt
+            mov eax,offset msg2
+            call dispmsg
+            mov eax,offset buffer
+            call dispmsg
+            ;
+            pop ecx
+            xor ebx,ebx
+            mov al,key
+    decrypt:xor buffer[ebx],al
+            inc ebx
+            dec ecx
+            jnz decrypt
+            mov eax,offset msg3
+            call dispmsg
+            mov eax,offset buffer
+            mov eax,offset buffer
+            call dispmsg
+exit 0
+end start
+
+-----------------------------------------------------------------
+
+

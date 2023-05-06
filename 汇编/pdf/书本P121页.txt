@@ -1,0 +1,32 @@
+include io32.inc
+.data
+    regd byte 'EAX=',8 dup (0),'H',0
+
+.code
+start:
+    mov eax,1234abcdh
+    xor ebx,ebx
+    mov ecx,8
+    again:  rol eax,4
+            push eax
+            call htoasc
+            mov regd+4[ebx],al
+            pop eax
+            inc ebx
+            dec ecx
+            jnz again
+            mov eax,offset regd
+            call dispmsg
+            
+    htoasc  proc
+             and al,0fh
+             or al,30h
+             cmp al,39h
+             jbe htoend
+             add al,7
+             
+    htoend:  ret
+    htoasc  endp
+    
+exit 0
+end start

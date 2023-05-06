@@ -1,0 +1,57 @@
+include io32.inc
+.data
+    array dword 1234567890,-1234,0,1,-987654321,32767,-32768,5678,-5678,9000
+    writebuf byte 12 dup(0)
+
+.code
+start:
+    mov ecx,lengthof array
+    mov ebx,0
+    ;循环10次，知道ecx等于0
+    again:  mov eax,array[ebx*4]
+            call write        ;执行write函数
+            call dispcrlf      ;换行
+            inc ebx    ;ebx+1
+            dec ecx    ;ecx减1
+            jnz again
+    
+    write proc              ;name proc      name endp
+          push ebx
+          push ecx
+          push edx
+          mov ebx,offset writebuf     ;使用ebx寄存器访问变量writebuf
+          test eax,eax    ;与运算。如果非0，zf=0;eax=0,zf=1。判断是否为0
+          jnz write1      ;不为0时，跳转
+          mov byte ptr [ebx],'0'
+          inc ebx
+          jmp write2
+    write1:  jns write2     ;sf=0，最高位值，运算结果非负。跳
+             mov byte ptr [ebx],'-'
+             inc ebx
+             neg eax
+    write2:  mov ecx,10
+             push ecx
+    write3:  cmp eax,0
+             jz write4
+             xor edx,edx
+             div ecx
+             add edx,30h
+             push edx
+             jmp write3
+    write4:  pop edx
+             cmp edx,ecx
+             je write5
+             mov [ebx],dl
+             inc ebx
+             jmp write4
+    write5:  mov byte ptr [ebx],0
+             mov eax,offset writebuf
+             call dispmsg
+             pop edx
+             pop ecx
+             pop ebx
+             ret
+    write endp
+    
+exit 0
+end start
