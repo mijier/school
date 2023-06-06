@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--早餐菜单-->
+<breakfast_menu>
+	<food>
+		<name>豆浆</name>
+		<price>￥2.0</price>
+		<description>方便、快捷</description>
+		<calories>40</calories>
+		<卡路里>25</卡路里>
+		
+	</food>
+
+	
+</breakfast_menu>

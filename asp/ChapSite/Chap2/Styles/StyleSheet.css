@@ -1,0 +1,6 @@
+﻿* { font-family: 隶书; }
+[title~=attrr] { color: #317a5a; }
+[title*=attribut] { color: #800080; }
+p { color: #40eba6; }
+.classTest { color: #800000; }
+#divTest { color: #808000; }
